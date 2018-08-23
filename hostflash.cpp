@@ -145,6 +145,23 @@ static bus::match::match hiomap_match_signal_v2(struct hostflash *ctx, const cha
     return match;
 }
 
+static ipmi_ret_t flash_command_reset(ipmi_request_t request,
+                                      ipmi_response_t response,
+                                      ipmi_data_len_t data_len,
+                                      ipmi_context_t context)
+{
+    struct hostflash *ctx = static_cast<struct hostflash *>(context);
+
+    auto m = ctx->bus->new_method_call(HIOMAPD_SERVICE, HIOMAPD_OBJECT,
+                                       HIOMAPD_IFACE, "Reset");
+    /* FIXME: Catch SdBusError and return appropriate CC */
+    ctx->bus->call(m);
+
+    *data_len = 0;
+
+    return IPMI_CC_OK;
+}
+
 static ipmi_ret_t flash_command_get_info(ipmi_request_t request,
                                          ipmi_response_t response,
                                          ipmi_data_len_t data_len,
@@ -183,7 +200,7 @@ static ipmi_ret_t flash_command_get_info(ipmi_request_t request,
 
 static const flash_command flash_commands[] = {
     [0] = NULL,                         /* 0 is an invalid command ID */
-    [1] = NULL,                         /* RESET */
+    [1] = flash_command_reset,
     [2] = flash_command_get_info,
 };
 
