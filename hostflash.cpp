@@ -157,10 +157,8 @@ static ipmi_ret_t flash_command_get_info(ipmi_request_t request,
     }
 
     uint8_t *reqdata = (uint8_t *)request;
-    auto m = ctx->bus->new_method_call("xyz.openbmc_project.hiomapd",
-                                       "/xyz/openbmc_project/hiomapd",
-                                       "xyz.openbmc_project.hiomapd.protocol",
-                                       "GetInfo");
+    auto m = ctx->bus->new_method_call(HIOMAPD_SERVICE, HIOMAPD_OBJECT,
+                                       HIOMAPD_IFACE, "GetInfo");
     m.append(get<uint8_t>(&reqdata[0]));
 
     /* FIXME: Catch SdBusError and return appropriate CC */
